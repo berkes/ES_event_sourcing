@@ -3,6 +3,10 @@
   text-shadow: 1px 1px 10px #191919;
 }
 
+.reveal pre code {
+  max-height: 600px;
+}
+
 .body {
   background-color: #DDD;
 }

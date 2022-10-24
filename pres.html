@@ -149,7 +149,7 @@
 </section>
 <section class="slide level2">
 
-<p>We store all the transactions - events. Balans krijgen we door ze te doorlopen.</p>
+<p>We slaan alle transacties op - events. Balans krijgen we door ze te doorlopen.</p>
 </section>
 <section class="slide level2">
 
@@ -200,61 +200,70 @@
 <blockquote>
 <p>Het algemene doel van een logboek is dat later teruggelezen kan worden wat er precies gebeurd is op een bepaald moment. Op het moment van opschrijven is dus nog niet bekend wat men later terug wil lezen. Het is dus van groot belang dat alle details in het logboek terechtkomen, zodat men later niets mist.</p>
 </blockquote>
+</section>
+<section class="slide level2">
+
 <blockquote>
 <p>Ook is het van belang dat de vastleggingen in een logboek authentiek zijn. De gegevens mogen niet verwijderd of ongecontroleerd gemuteerd worden.</p>
 </blockquote>
+<p><a href="https://nl.wikipedia.org/wiki/Logboek">Wikipedia Logboek</a></p>
 </section>
-<section id="wikipedia-logboek" class="slide level2">
-<h2><a href="https://nl.wikipedia.org/wiki/Logboek">Wikipedia Logboek</a></h2>
+<section class="slide level2">
+
 <figure>
 <img data-src="./dddbook.jpg" alt="" /><figcaption>DDD Book cover</figcaption>
 </figure>
 </section>
 <section class="slide level2">
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co"># frozen_string_literal: true</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">##</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co"># A position is the amount of a security, asset, or property that is owned (or</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co"># sold short) by some individual or other entity.</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Position</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="ot">attr_reader</span> <span class="st">:total_buying_price</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  <span class="kw">def</span> initialize(ticker:, currency:)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    <span class="ot">@events</span> = []</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="ot">@ticker</span> = ticker</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>    <span class="ot">@currency</span> = currency</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>    <span class="ot">@total_buying_price</span> = <span class="dv">0</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="kw">def</span> add_transaction(amount:, price:)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>    handle_event(<span class="dt">PositionAdded</span>.new(<span class="st">amount: </span>amount, <span class="st">price: </span>price))</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">##</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co"># A position is the amount of a security, asset, or property that is owned (or</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co"># sold short) by some individual or other entity.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Position</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="ot">attr_reader</span> <span class="st">:total_buying_price</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="kw">def</span> initialize(ticker:, currency:)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    <span class="ot">@events</span> = []</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="ot">@ticker</span> = ticker</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    <span class="ot">@currency</span> = currency</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="ot">@total_buying_price</span> = <span class="dv">0</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>  <span class="kw">def</span> add_transaction(amount:, price:)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>    handle_event(<span class="dt">PositionAdded</span>.new(<span class="st">amount: </span>amount, <span class="st">price: </span>price))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>  <span class="kw">private</span></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>  <span class="kw">private</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>  <span class="ot">attr_reader</span> <span class="st">:events</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>  <span class="ot">attr_reader</span> <span class="st">:events</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>  <span class="co">##</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>  <span class="co"># Handles an incoming event.</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>  <span class="co"># For now, we keep it simple: no DSLs or fancy metaprogramming, just a switch.</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>  <span class="kw">def</span> handle_event(event)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>    <span class="ot">@events</span> &lt;&lt; event</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>    <span class="kw">case</span> event</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>    <span class="kw">when</span> <span class="dt">PositionAdded</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>      handle_position_added(event)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>    <span class="kw">end</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>  <span class="co">##</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>  <span class="co"># Our handle_event calls this method for each PositionAdded event</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>  <span class="kw">def</span> handle_position_added(event)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>    <span class="ot">@total_buying_price</span> += event.amount * event.price</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a><span class="kw">end</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">PositionAdded</span> &lt; <span class="dt">OpenStruct</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>  <span class="co">##</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>  <span class="co"># Handles an incoming event.</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>  <span class="co"># For now, we keep it simple: no DSLs or fancy metaprogramming, just a switch.</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>  <span class="kw">def</span> handle_event(event)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>    <span class="ot">@events</span> &lt;&lt; event</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>    <span class="kw">case</span> event</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>    <span class="kw">when</span> <span class="dt">PositionAdded</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>      handle_position_added(event)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>  <span class="co">##</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>  <span class="co"># Our handle_event calls this method for each PositionAdded event</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>  <span class="kw">def</span> handle_position_added(event)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>    <span class="ot">@total_buying_price</span> += event.amount * event.price</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">PositionAdded</span> &lt; <span class="dt">OpenStruct</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<div class="sourceCode" id="cb2"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>aapl = <span class="dt">Position</span>.new(<span class="st">ticker: &#39;AAPL&#39;</span>, <span class="st">currency: &#39;USD&#39;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>aapl.add_transaction(<span class="st">amount: </span><span class="dv">2</span>, <span class="st">price: </span><span class="fl">131.13</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>aapl.add_transaction(<span class="st">amount: </span><span class="dv">3</span>, <span class="st">price: </span><span class="fl">172.42</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>puts aapl.total_buying_price</span></code></pre></div>
 </section>
 <section id="the-world-of-es" class="slide level2">
 <h2>The world of ES</h2>

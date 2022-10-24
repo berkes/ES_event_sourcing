@@ -40,7 +40,7 @@ Aggregate, Left Fold, Reduce, Projection, etc.
 
 ---
 
-We store all the transactions - events. Balans krijgen we door ze te doorlopen.
+We slaan alle transacties op - events. Balans krijgen we door ze te doorlopen.
 
 ---
 
@@ -78,19 +78,19 @@ We store all the transactions - events. Balans krijgen we door ze te doorlopen.
 
 > Het algemene doel van een logboek is dat later teruggelezen kan worden wat er precies gebeurd is op een bepaald moment. Op het moment van opschrijven is dus nog niet bekend wat men later terug wil lezen. Het is dus van groot belang dat alle details in het logboek terechtkomen, zodat men later niets mist.
 
+---
+
 > Ook is het van belang dat de vastleggingen in een logboek authentiek zijn. De gegevens mogen niet verwijderd of ongecontroleerd gemuteerd worden. 
 
 [Wikipedia Logboek](https://nl.wikipedia.org/wiki/Logboek)
+
 ---
 
 ![DDD Book cover](./dddbook.jpg)
 
-
 ---
 
 ```ruby
-# frozen_string_literal: true
-
 ##
 # A position is the amount of a security, asset, or property that is owned (or
 # sold short) by some individual or other entity.
@@ -134,6 +134,14 @@ class PositionAdded < OpenStruct
 end
 ```
 
+---
+
+```ruby
+aapl = Position.new(ticker: 'AAPL', currency: 'USD')
+aapl.add_transaction(amount: 2, price: 131.13)
+aapl.add_transaction(amount: 3, price: 172.42)
+puts aapl.total_buying_price
+```
 
 ## The world of ES
 
