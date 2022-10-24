@@ -28,7 +28,7 @@ lang: nl
 * Wegwijs worden in de chaos van TLAs.
 * Een volgend project met ES opzetten?
 
-## Event Sourcing is simpel.
+# Event Sourcing is simpel.
 
 ---
 
@@ -54,8 +54,17 @@ We slaan alle transacties op - events. Balans krijgen we door ze te doorlopen.
 
 ---
 
+:::::::::::::: {.columns align=top .onlytextwidth}
+::: {.column width="60%" align=center} 
+
 * Wat zouden we een klant die een balpen koopt nog meer aanraden?
 * Bij welke prijzen gaan klanten producten uit de winkelwagen halen?
+
+:::
+::: {.column width="40%"}
+![Cart Flow](./cart_flow_event_sourced.png)
+:::
+::::::::::::::
 
 ---
 
@@ -86,26 +95,47 @@ We slaan alle transacties op - events. Balans krijgen we door ze te doorlopen.
 
 ---
 
+![Events: Immutable. Event Log: Append Only](./immutable.jpg)
+
+---
+
+* Hoe herstel je een foute "X aangemaakt" of "Y verwijderd"?
+* Met een tegengestelde "X weggehaald" of "Y toegevoegd".
+* En nooit door X-aangemaakt of Y-verwijderd te verwijderen.
+
+---
+
 ![DDD Book cover](./dddbook.jpg)
 
 ---
 
 ```ruby
 ##
-# A position is the amount of a security, asset, or property that is owned (or
-# sold short) by some individual or other entity.
+# A position is the amount of a security, asset, or property 
+# that is owned (or sold short) by some individual or other entity.
 class Position
-  attr_reader :total_buying_price
+  attr_reader :total_buying_price, :amount
 
   def initialize(ticker:, currency:)
     @events = []
     @ticker = ticker
     @currency = currency
     @total_buying_price = 0
+    @amount = 0
   end
 
-  def add_transaction(amount:, price:)
-    handle_event(PositionAdded.new(amount: amount, price: price))
+  def buy(amount:, price:)
+    handle_event(
+      PositionIncreased.new(
+        amount: amount,
+        price: price
+      )
+    )
+  end
+
+  def sell(amount:, price:)
+    fail "Cannot sell more than #{@amount}" if amount > @amount
+    handle_event(PositionReduced.new(amount: amount, price: price))
   end
 
   private
@@ -118,34 +148,131 @@ class Position
   def handle_event(event)
     @events << event
     case event
-    when PositionAdded
-      handle_position_added(event)
+    when PositionIncreased then handle_position_increased(event)
+    when PositionReduced   then handle_position_reduced(event)
     end
   end
 
   ##
   # Our handle_event calls this method for each PositionAdded event
-  def handle_position_added(event)
+  def handle_position_increased(event)
+    @amount += event.amount
     @total_buying_price += event.amount * event.price
+  end
+
+  ##
+  # Our handle_event calls this method for each PositionAdded event
+  def handle_position_reduced(event)
+    @amount -= event.amount
   end
 end
 
-class PositionAdded < OpenStruct
+class PositionIncreased < OpenStruct
+end
+class PositionReduced < OpenStruct
 end
 ```
+
+::: notes
+
+- Domain models with Domain meaning and domain specific API.
+- Events are past tense.
+- Validation done before storing event.
+- It doesn't yet store events.
+
+:::
 
 ---
 
 ```ruby
 aapl = Position.new(ticker: 'AAPL', currency: 'USD')
-aapl.add_transaction(amount: 2, price: 131.13)
-aapl.add_transaction(amount: 3, price: 172.42)
+aapl.buy(amount: 2, price: 131.13)
+aapl.sell(amount: 1, price: 142.00)
+aapl.buy(amount: 3, price: 172.42)
 puts aapl.total_buying_price
+# 779.52
+puts aapl.amount
+# 4
 ```
+
+---
+
+* Heel makkelijk te testen.
+* Zeer eenvoudig uit te breiden.
+* Business logic: cohesive.
+
+---
+
+```ruby
+
+class Aggregate
+  def load(id, event_repo)
+    instance = new(id, event_repo)
+    events = event_repo.get_all_for(id)
+    events.each do |event|
+      instance.handle_event(event)
+    end
+    instance
+  end
+
+  def initialize(id, event_repo)
+    @id = id
+    @event_repo = event_repo
+    @version = 0
+  end
+
+  def handle_event(event)
+    @version++
+    event_repo.add(event)
+  end
+end
+
+class Position < Aggregate
+  def initialize(id, event_repo)
+    super(id, event_repo)
+    @opened = false
+  end
+
+  def open(ticker: ticker, currency: currency)
+    handle_event(PositionOpened.new(ticker: ticker, currency: currency))
+  end
+
+  def buy()
+    fail "must first open the position before buying stocks" unless @opened
+    #...
+  end
+
+  def handle_event(event)
+    super(event)
+    # ...
+  end
+
+  def handle_open(event)
+    @ticker = event.ticker
+    @currency = event.currency
+    @opened = true
+  end
+end
+
+aapl = Position.load('AAPL-USD', pg_event_store)
+aapl.open(ticker: 'AAPL', currency: 'USD')
+aapl.buy(amount: 2, price: 131.13)
+aapl.sell(amount: 1, price: 142.00)
+
+aapl = Position.load('AAPL-USD', pg_event_store)
+aapl.buy(amount: 3, price: 172.42)
+puts aapl.total_buying_price
+# 779.52
+puts aapl.amount
+# 4
+
+```
+
+---
 
 ## The world of ES
 
-![The world of DDD](./ddd.png)
+![The world of ES](./ddd.png)
 
 ## Pro's and cons
 
