@@ -106,8 +106,8 @@
 </section>
 
 <section>
-<section id="event-sourcing" class="title-slide slide level1" data-background-image="./dvd_screensaver.gif">
-<h1 data-background-image="./dvd_screensaver.gif">Event Sourcing</h1>
+<section id="event-sourcing" class="title-slide slide level1" data-background-image="./dvd_screensaver.gif" data-background-size="contain">
+<h1 data-background-image="./dvd_screensaver.gif" data-background-size="contain">Event Sourcing</h1>
 
 </section>
 <section id="over-deze-presentatie" class="slide level2">
@@ -170,14 +170,19 @@
 <section class="slide level2">
 
 <div class="columns onlytextwidth" data-align="top">
-<div class="column" data-align="center" style="width:60%;">
+<div class="column" data-align="left" style="width:50%;">
 <ul>
 <li class="fragment">Wat zouden we een klant die een balpen koopt nog meer aanraden?</li>
 <li class="fragment">Bij welke prijzen gaan klanten producten uit de winkelwagen halen?</li>
+<li class="fragment">Wanneer kan voorraad gereserveerd worden?</li>
 </ul>
-</div><div class="column" style="width:40%;">
+</div><div class="column" style="width:20%;">
 <figure>
-<img data-src="./cart_flow_event_sourced.png" alt="" /><figcaption>Cart Flow</figcaption>
+<img data-src="./cart_flow_event_sourced.png" alt="" /><figcaption>Cart ES</figcaption>
+</figure>
+</div><div class="column" style="width:30%;">
+<figure>
+<img data-src="./cart_flow_final_state.png" alt="" /><figcaption>Cart State</figcaption>
 </figure>
 </div>
 </div>
@@ -270,37 +275,35 @@
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a></span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>  <span class="kw">private</span></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  <span class="ot">attr_reader</span> <span class="st">:events</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>  <span class="co">##</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>  <span class="co"># Handles an incoming event.</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>  <span class="co"># For now, we keep it simple: no DSLs or fancy metaprogramming, just a switch.</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>  <span class="kw">def</span> handle_event(event)</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>    <span class="ot">@events</span> &lt;&lt; event</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>    <span class="kw">case</span> event</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>    <span class="kw">when</span> <span class="dt">PositionIncreased</span> <span class="kw">then</span> handle_position_increased(event)</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>    <span class="kw">when</span> <span class="dt">PositionReduced</span>   <span class="kw">then</span> handle_position_reduced(event)</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>    <span class="kw">end</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>  <span class="co">##</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>  <span class="co"># Our handle_event calls this method for each PositionAdded event</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>  <span class="kw">def</span> handle_position_increased(event)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>    <span class="ot">@amount</span> += event.amount</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>    <span class="ot">@total_buying_price</span> += event.amount * event.price</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a>  <span class="co">##</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a>  <span class="co"># Our handle_event calls this method for each PositionAdded event</span></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true"></a>  <span class="kw">def</span> handle_position_reduced(event)</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true"></a>    <span class="ot">@amount</span> -= event.amount</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true"></a><span class="kw">end</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true"></a></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">PositionIncreased</span> &lt; <span class="dt">OpenStruct</span></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true"></a><span class="kw">end</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">PositionReduced</span> &lt; <span class="dt">OpenStruct</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  <span class="co">##</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>  <span class="co"># Handles an incoming event.</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>  <span class="co"># For now, we keep it simple: no DSLs or fancy metaprogramming, just a switch.</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>  <span class="kw">def</span> handle_event(event)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>    <span class="ot">@events</span> &lt;&lt; event</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>    <span class="kw">case</span> event</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>    <span class="kw">when</span> <span class="dt">PositionIncreased</span> <span class="kw">then</span> handle_position_increased(event)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>    <span class="kw">when</span> <span class="dt">PositionReduced</span>   <span class="kw">then</span> handle_position_reduced(event)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>  <span class="co">##</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>  <span class="co"># Our handle_event calls this method for each PositionAdded event</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>  <span class="kw">def</span> handle_position_increased(event)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>    <span class="ot">@amount</span> += event.amount</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>    <span class="ot">@total_buying_price</span> += event.amount * event.price</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a>  <span class="co">##</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a>  <span class="co"># Our handle_event calls this method for each PositionAdded event</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a>  <span class="kw">def</span> handle_position_reduced(event)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a>    <span class="ot">@amount</span> -= event.amount</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">PositionIncreased</span> &lt; <span class="dt">OpenStruct</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">PositionReduced</span> &lt; <span class="dt">OpenStruct</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
 <aside class="notes">
 <ul>
 <li>Domain models with Domain meaning and domain specific API.</li>
@@ -345,75 +348,145 @@
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>  <span class="kw">def</span> initialize(id, event_repo)</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>    <span class="ot">@id</span> = id</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>    <span class="ot">@event_repo</span> = event_repo</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>    <span class="ot">@version</span> = <span class="dv">0</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>  <span class="kw">def</span> handle_event(event)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>    <span class="ot">@version</span>++</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>    event_repo.add(event)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="kw">end</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Position</span> &lt; <span class="dt">Aggregate</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>  <span class="kw">def</span> initialize(id, event_repo)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>    <span class="dv">super</span>(id, event_repo)</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a>    <span class="ot">@opened</span> = <span class="dv">false</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>  <span class="kw">def</span> open(<span class="st">ticker: </span>ticker, <span class="st">currency: </span>currency)</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a>    handle_event(<span class="dt">PositionOpened</span>.new(<span class="st">ticker: </span>ticker, <span class="st">currency: </span>currency))</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a>  <span class="kw">def</span> buy()</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a>    fail <span class="st">&quot;must first open the position before buying stocks&quot;</span> <span class="kw">unless</span> <span class="ot">@opened</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a>    <span class="co">#...</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a>  <span class="kw">def</span> handle_event(event)</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a>    <span class="dv">super</span>(event)</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a>    <span class="co"># ...</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a>  <span class="kw">def</span> handle_open(event)</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a>    <span class="ot">@ticker</span> = event.ticker</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a>    <span class="ot">@currency</span> = event.currency</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a>    <span class="ot">@opened</span> = <span class="dv">true</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a>  <span class="kw">end</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true"></a><span class="kw">end</span></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true"></a></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true"></a>aapl = <span class="dt">Position</span>.load(<span class="st">&#39;AAPL-USD&#39;</span>, pg_event_store)</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true"></a>aapl.open(<span class="st">ticker: &#39;AAPL&#39;</span>, <span class="st">currency: &#39;USD&#39;</span>)</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true"></a>aapl.buy(<span class="st">amount: </span><span class="dv">2</span>, <span class="st">price: </span><span class="fl">131.13</span>)</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true"></a>aapl.sell(<span class="st">amount: </span><span class="dv">1</span>, <span class="st">price: </span><span class="fl">142.00</span>)</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true"></a></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true"></a>aapl = <span class="dt">Position</span>.load(<span class="st">&#39;AAPL-USD&#39;</span>, pg_event_store)</span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true"></a>aapl.buy(<span class="st">amount: </span><span class="dv">3</span>, <span class="st">price: </span><span class="fl">172.42</span>)</span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true"></a>puts aapl.total_buying_price</span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true"></a><span class="co"># 779.52</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true"></a>puts aapl.amount</span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true"></a><span class="co"># 4</span></span></code></pre></div>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>  <span class="kw">def</span> handle_event(event)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>    event_repo.add(<span class="ot">@id</span>, event)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">Position</span> &lt; <span class="dt">Aggregate</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>  <span class="kw">def</span> initialize(id, event_repo)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>    <span class="dv">super</span>(id, event_repo)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>    <span class="ot">@opened</span> = <span class="dv">false</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>  <span class="kw">def</span> open(<span class="st">ticker: </span>ticker, <span class="st">currency: </span>currency)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>    handle_event(<span class="dt">PositionOpened</span>.new(<span class="st">ticker: </span>ticker, <span class="st">currency: </span>currency))</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a>  <span class="kw">def</span> buy()</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a>    fail <span class="st">&quot;must first open the position before buying stocks&quot;</span> <span class="kw">unless</span> <span class="ot">@opened</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a>    <span class="co">#...</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a>  <span class="kw">def</span> handle_event(event)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a>    <span class="dv">super</span>(event)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a>    <span class="co"># ...</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a>  <span class="kw">def</span> handle_open(event)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a>    <span class="ot">@ticker</span> = event.ticker</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a>    <span class="ot">@currency</span> = event.currency</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a>    <span class="ot">@opened</span> = <span class="dv">true</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a>  <span class="kw">end</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true"></a>aapl = <span class="dt">Position</span>.load(<span class="st">&#39;AAPL-USD&#39;</span>, pg_event_store)</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true"></a>aapl.open(<span class="st">ticker: &#39;AAPL&#39;</span>, <span class="st">currency: &#39;USD&#39;</span>)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true"></a>aapl.buy(<span class="st">amount: </span><span class="dv">2</span>, <span class="st">price: </span><span class="fl">131.13</span>)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true"></a>aapl.sell(<span class="st">amount: </span><span class="dv">1</span>, <span class="st">price: </span><span class="fl">142.00</span>)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true"></a>aapl = <span class="dt">Position</span>.load(<span class="st">&#39;AAPL-USD&#39;</span>, pg_event_store)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true"></a>aapl.buy(<span class="st">amount: </span><span class="dv">3</span>, <span class="st">price: </span><span class="fl">172.42</span>)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true"></a>puts aapl.total_buying_price</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true"></a><span class="co"># 779.52</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true"></a>puts aapl.amount</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true"></a><span class="co"># 4</span></span></code></pre></div>
+<aside class="notes">
+<ul>
+<li>Separated Infra and Domain</li>
+<li>Initializer generalized (infra) domain has open()</li>
+<li>Events stored in a database on ID</li>
+<li>Events loaded from a database on ID</li>
+</ul>
+</aside>
+</section></section>
+<section>
+<section id="the-world-of-es" class="title-slide slide level1">
+<h1>The world of ES</h1>
+<p><img data-src="./ddd.png" class="stretch" alt="The world of ES" /><br />
+</p>
 </section>
-<section id="the-world-of-es" class="slide level2">
-<h2>The world of ES</h2>
+<section id="event-x" class="slide level2">
+<h2>Event-X</h2>
+<p>Eventbased, event-driven, event-bus, event-loop, event-passing, event-streaming</p>
+</section>
+<section id="aggregate" class="slide level2">
+<h2>Aggregate</h2>
+<ul>
+<li class="fragment">Root Aggregate.</li>
+<li class="fragment">Onze “Position” was een Root Aggregate.</li>
+<li class="fragment">Position werd “gehydrate” vanuit de event source.</li>
+</ul>
+</section>
+<section id="cqrs" class="slide level2">
+<h2>CQRS</h2>
 <figure>
-<img data-src="./ddd.png" alt="" /><figcaption>The world of ES</figcaption>
+<img data-src="./cqrs.png" alt="" /><figcaption>Command Query Responsibility Principle</figcaption>
 </figure>
 </section>
-<section id="pros-and-cons" class="slide level2">
-<h2>Pro’s and cons</h2>
+<section id="projection" class="slide level2">
+<h2>Projection</h2>
+<ul>
+<li class="fragment">AKA Materialized View</li>
+<li class="fragment">Gebouwd door een Projector</li>
+<li class="fragment">Query Handler kan hierin lezen</li>
+<li class="fragment">Bijv een <code>PositionOpened</code> wordt door de <code>OpenPositionsProjector</code> afgehandeld, welke eeen simpel lijstje van alle <code>position.id</code>s bijhoudt.</li>
+</ul>
 </section>
-<section id="es-everything" class="slide level2">
-<h2>ES everything</h2>
+<section id="reactors" class="slide level2">
+<h2>Reactors</h2>
+<ul>
+<li class="fragment">Event Handlers (Projector is er een)</li>
+<li class="fragment">Reactors trigger behaviour</li>
+<li class="fragment">Nieuwe events uitzenden</li>
+<li class="fragment">Veranderen de buitenwereld (notificaties, calls, etc)</li>
+</ul>
 </section>
-<section id="resources" class="slide level2">
-<h2>Resources</h2>
+<section id="commands-command-handlers" class="slide level2">
+<h2>Commands, Command Handlers</h2>
+<ul>
+<li class="fragment">De publieke API.</li>
+<li class="fragment">Commands zijn intenties: tegenwoordige tijd: OpenPosition.</li>
+<li class="fragment">Command Handlers bevatten validatie.</li>
+</ul>
+</section>
+<section id="overview" class="slide level2">
+<h2>Overview</h2>
+<p><img data-src="./full_flow.png" class="stretch" alt="Full Flow" /><br />
+</p>
+</section></section>
+<section id="pros-and-cons" class="title-slide slide level1">
+<h1>Pro’s and cons</h1>
+<div class="columns onlytextwidth" data-align="top">
+<div class="column" data-align="center" style="width:50%;">
+<ul>
+<li class="fragment">Eventual-consistency is lastig.</li>
+<li class="fragment">Weinig frameworks - weinig documentatie.</li>
+<li class="fragment">Vereist domeinkennis.</li>
+<li class="fragment">Complexe dataflow.</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li class="fragment">Makkelijk te testen, valideren, debuggen en beredeneren.</li>
+<li class="fragment">Schaalbaar in alle richtingen.</li>
+<li class="fragment">Past domeinkennis.</li>
+<li class="fragment">Logische dataflow</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="resources" class="title-slide slide level1">
+<h1>Resources</h1>
 <ul>
 <li class="fragment">Domain-Driven Design: Tackling Complexity in the Heart of Software - Eric Evans</li>
 <li class="fragment">Implementing Domain-Driven Design - Vaugh Vernon</li>
 <li class="fragment">https://martinfowler.com/eaaDev/EventSourcing.html - Martin Fowler</li>
 <li class="fragment">https://www.youtube.com/watch?v=LDW0QWie21s - DDD, CQRS and Event Sourcing - Greg Young</li>
 </ul>
-</section></section>
+</section>
     </div>
   </div>
 

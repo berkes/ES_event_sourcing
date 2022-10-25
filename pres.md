@@ -8,7 +8,7 @@ keywords: es, eventsourcing, ddd
 lang: nl
 ---
 
-# Event Sourcing {background-image="./dvd_screensaver.gif"}
+# Event Sourcing {background-image="./dvd_screensaver.gif" background-size=contain}
 
 ## Over deze presentatie
 
@@ -55,14 +55,18 @@ We slaan alle transacties op - events. Balans krijgen we door ze te doorlopen.
 ---
 
 :::::::::::::: {.columns align=top .onlytextwidth}
-::: {.column width="60%" align=center} 
+::: {.column width="50%" align=left} 
 
 * Wat zouden we een klant die een balpen koopt nog meer aanraden?
 * Bij welke prijzen gaan klanten producten uit de winkelwagen halen?
+* Wanneer kan voorraad gereserveerd worden?
 
 :::
-::: {.column width="40%"}
-![Cart Flow](./cart_flow_event_sourced.png)
+::: {.column width="20%"}
+![Cart ES](./cart_flow_event_sourced.png)
+:::
+::: {.column width="30%"}
+![Cart State](./cart_flow_final_state.png)
 :::
 ::::::::::::::
 
@@ -140,8 +144,6 @@ class Position
 
   private
 
-  attr_reader :events
-
   ##
   # Handles an incoming event.
   # For now, we keep it simple: no DSLs or fancy metaprogramming, just a switch.
@@ -218,12 +220,10 @@ class Aggregate
   def initialize(id, event_repo)
     @id = id
     @event_repo = event_repo
-    @version = 0
   end
 
   def handle_event(event)
-    @version++
-    event_repo.add(event)
+    event_repo.add(@id, event)
   end
 end
 
@@ -267,18 +267,79 @@ puts aapl.amount
 # 4
 
 ```
+::: notes
 
----
+- Separated Infra and Domain
+- Initializer generalized (infra) domain has open()
+- Events stored in a database on ID
+- Events loaded from a database on ID
 
-## The world of ES
+:::
 
-![The world of ES](./ddd.png)
+# The world of ES
 
-## Pro's and cons
+![The world of ES](./ddd.png){.stretch}\
 
-## ES everything
+## Event-X
 
-## Resources
+Eventbased, event-driven, event-bus, event-loop, event-passing, event-streaming
+
+## Aggregate
+
+* Root Aggregate.
+* Onze "Position" was een Root Aggregate.
+* Position werd "gehydrate" vanuit de event source.
+
+## CQRS
+
+![Command Query Responsibility Principle](./cqrs.png)
+
+## Projection
+
+* AKA Materialized View
+* Gebouwd door een Projector
+* Query Handler kan hierin lezen
+* Bijv een `PositionOpened` wordt door de `OpenPositionsProjector` afgehandeld, welke eeen simpel lijstje van alle `position.id`s bijhoudt.
+
+## Reactors
+
+* Event Handlers (Projector is er een)
+* Reactors trigger behaviour
+* Nieuwe events uitzenden
+* Veranderen de buitenwereld (notificaties, calls, etc)
+
+## Commands, Command Handlers
+
+* De publieke API.
+* Commands zijn intenties: tegenwoordige tijd: OpenPosition.
+* Command Handlers bevatten validatie.
+
+## Overview
+
+![Full Flow](./full_flow.png){.stretch}\
+
+# Pro's and cons
+
+:::::::::::::: {.columns align=top .onlytextwidth}
+::: {.column width="50%" align=center} 
+
+* Eventual-consistency is lastig.
+* Weinig frameworks - weinig documentatie.
+* Vereist domeinkennis.
+* Complexe dataflow.
+
+:::
+::: {.column width="50%"}
+
+* Makkelijk te testen, valideren, debuggen en beredeneren.
+* Schaalbaar in alle richtingen.
+* Past domeinkennis.
+* Logische dataflow
+
+:::
+::::::::::::::
+
+# Resources
 
 * Domain-Driven Design: Tackling Complexity in the Heart of Software - Eric Evans
 * Implementing Domain-Driven Design - Vaugh Vernon
