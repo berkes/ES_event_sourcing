@@ -343,5 +343,5 @@ Eventbased, event-driven, event-bus, event-loop, event-passing, event-streaming
 
 * Domain-Driven Design: Tackling Complexity in the Heart of Software - Eric Evans
 * Implementing Domain-Driven Design - Vaugh Vernon
-* https://martinfowler.com/eaaDev/EventSourcing.html - Martin Fowler
-* https://www.youtube.com/watch?v=LDW0QWie21s - DDD, CQRS and Event Sourcing - Greg Young
+* [Martin Fowler on Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html)
+* [DDD, CQRS and Event Sourcing - Talk by Greg Young](https://www.youtube.com/watch?v=LDW0QWie21s)
